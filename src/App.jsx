@@ -40,60 +40,7 @@ const snacks = [
   },
 ];
 
-const snackReducer = (state, action) => {
-  console.log("sort", state, action.type, action.payload);
-
-  switch (action.type) {
-    case "WEIGHTASC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(a.product_weight) - parseInt(b.product_weight);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    case "WEIGHTDSC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(b.product_weight) - parseInt(a.product_weight);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    case "PRICEASC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(a.price) - parseInt(b.price);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    case "PRICEDSC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(b.price) - parseInt(a.price);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    case "CALORIESASC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(a.calories) - parseInt(b.calories);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    case "CALORIESDSC": {
-      const sort = [...action.payload].sort((a, b) => {
-        return parseInt(b.calories) - parseInt(a.calories);
-      });
-      console.log("sorted asc", sort);
-      return sort;
-    }
-    default:
-      return state;
-  }
-};
-
 function App() {
-  const [state, snackDispatch] = useReducer(snackReducer, snacks);
-
   const [showData, setShowData] = useState(snacks);
   const [weightAsc, setWeightAsc] = useState(false);
   const [priceAsc, setPriceAsc] = useState(false);
@@ -101,31 +48,55 @@ function App() {
 
   const handleChange = (event) => {
     console.log("word", event);
+    const searchItem = event.toLowerCase();
+    const found = snacks.filter((product) =>
+      product.product_name.toLowerCase().includes(searchItem)
+    );
+    setShowData(found);
   };
 
   const handleSorting = (val) => {
     let sorted = [];
-    console.log("val", val);
+
     if (val === 1) {
-      weightAsc
-        ? ({sorted = snackDispatch({ type: "WEIGHTASC", payload: snacks });
-        setShowData(sorted)}
-        )
-        : setShowData(() => {
-            snackDispatch({ type: "WEIGHTDSC", payload: snacks });
-          });
+      if (weightAsc) {
+        sorted = [...snacks].sort((a, b) => {
+          return parseInt(a.product_weight) - parseInt(b.product_weight);
+        });
+      } else {
+        sorted = [...snacks].sort((a, b) => {
+          return parseInt(b.product_weight) - parseInt(a.product_weight);
+        });
+      }
+      setShowData(sorted);
+      setWeightAsc((prev) => !prev);
     } else if (val === 2) {
-      priceAsc
-        ? snackDispatch({ type: "PRICEASC", payload: snacks })
-        : snackDispatch({ type: "PRICEDSC", payload: snacks });
+      if (priceAsc) {
+        sorted = [...snacks].sort((a, b) => {
+          return a.price - b.price;
+        });
+      } else {
+        sorted = [...snacks].sort((a, b) => {
+          return b.price - a.price;
+        });
+      }
+      setShowData(sorted);
       setPriceAsc((prev) => !prev);
     } else if (val === 3) {
-      caloriesAsc
-        ? snackDispatch({ type: "CALORIESASC", payload: snacks })
-        : snackDispatch({ type: "CALORIESDSC", payload: snacks });
+      if (caloriesAsc) {
+        sorted = [...snacks].sort((a, b) => {
+          return a.calories - b.calories;
+        });
+      } else {
+        sorted = [...snacks].sort((a, b) => {
+          return b.calories - a.calories;
+        });
+      }
+      setShowData(sorted);
       setCaloriesAsc((prev) => !prev);
     }
   };
+
   return (
     <>
       <h1>Snacks Table</h1>
